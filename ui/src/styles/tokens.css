@@ -1,0 +1,76 @@
+/* Layout: fixed-station terminal — status bar on top, mode rail left, conversation centre, sources right.
+   Colour follows high-performance HMI practice (ISA-101): neutral greys for normal state,
+   saturated colour reserved for alarms, warnings and OK status. One steel-blue accent marks
+   what can be pressed. */
+:root {
+  --bg: #e3e5e7;
+  --surface: #eef0f1;
+  --raised: #fbfbfc;
+  --line: #c4c9ce;
+  --line-strong: #9aa2aa;
+  --fg: #1a1f25;
+  --fg-muted: #57616b;
+  --accent: #1d5a8a;
+  --accent-fg: #ffffff;
+  --accent-soft: #d5e2ed;
+  --alarm: #b3261e;
+  --alarm-soft: #f5dcda;
+  --warn: #9a5b00;
+  --warn-soft: #f6e5c6;
+  --ok: #2b7a33;
+  --ok-soft: #d9ead9;
+  --focus: #1d5a8a;
+
+  --font-ui: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+  --font-label: 'IBM Plex Sans Condensed', 'Arial Narrow', 'Segoe UI', sans-serif;
+  --font-code: 'IBM Plex Mono', Consolas, 'Courier New', monospace;
+
+  /* Touch targets sized for gloved hands on a panel PC */
+  --hit: 3.5rem;
+  --radius: 6px;
+  --text-scale: 1;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #14181c;
+    --surface: #1b2025;
+    --raised: #232a30;
+    --line: #333b43;
+    --line-strong: #4b555f;
+    --fg: #e2e6e9;
+    --fg-muted: #97a1aa;
+    --accent: #5d9bd0;
+    --accent-fg: #0b1621;
+    --accent-soft: #1e3347;
+    --alarm: #ec6b62;
+    --alarm-soft: #3a1f1e;
+    --warn: #e2a53c;
+    --warn-soft: #362b17;
+    --ok: #6cbe72;
+    --ok-soft: #1c3120;
+    --focus: #8cbbe3;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --bg: #14181c;
+  --surface: #1b2025;
+  --raised: #232a30;
+  --line: #333b43;
+  --line-strong: #4b555f;
+  --fg: #e2e6e9;
+  --fg-muted: #97a1aa;
+  --accent: #5d9bd0;
+  --accent-fg: #0b1621;
+  --accent-soft: #1e3347;
+  --alarm: #ec6b62;
+  --alarm-soft: #3a1f1e;
+  --warn: #e2a53c;
+  --warn-soft: #362b17;
+  --ok: #6cbe72;
+  --ok-soft: #1c3120;
+  --focus: #8cbbe3;
+  color-scheme: dark;
+}

@@ -1,0 +1,1063 @@
+[
+  {
+    "id": "3.1",
+    "section": "3.1 System startup fault",
+    "page": 12,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "Control does not start after power-on; the PPU screen stays black",
+    "alarm_codes": [],
+    "alarm_text": "",
+    "steps": [
+      "Check the status LED on the PPU panel.",
+      "If the status LED is lit: power off, check that the CF card is inserted properly, then power on again and check whether the fault is gone.",
+      "If the status LED is off: check the power supply interface X1 on the back of the PPU – loose connection, whether the 24 V terminal matches the interface, and measure the 24 VDC supply with a multimeter.",
+      "If the fault still exists, the PPU is probably damaged – replacement and maintenance are needed."
+    ]
+  },
+  {
+    "id": "3.2",
+    "section": "3.2 PPU/HMI fault",
+    "page": 13,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "HMI screen or the keys on the PPU do not respond",
+    "alarm_codes": [],
+    "alarm_text": "",
+    "steps": [
+      "Check whether the control has crashed. If yes, restart the control and check whether the fault still exists.",
+      "If the fault still exists, the PPU is probably damaged – replacement and maintenance are needed."
+    ]
+  },
+  {
+    "id": "3.3",
+    "section": "3.3 MCP connection fault",
+    "page": 13,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "MCP does not respond after power-on: all MCP status LEDs are off, or all MCP status LEDs flash continuously",
+    "alarm_codes": ["400003"],
+    "alarm_text": "",
+    "steps": [
+      "Check that the connection cable between the MCP and the PPU is intact and properly connected; verify by trying a new cable.",
+      "Check whether PPU interface X30 or MCP interface X10 is damaged or has bad contact; verify by trying a new cable.",
+      "Check the PLC program – a PLC program fault can also make all MCP status LEDs flash.",
+      "If the fault still exists, the PPU or MCP is probably damaged – replacement and maintenance are needed."
+    ]
+  },
+  {
+    "id": "3.4",
+    "section": "3.4 MCP key press fault",
+    "page": 14,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "Some MCP keys do not respond, typically RESET or CYCLE START",
+    "alarm_codes": [],
+    "alarm_text": "",
+    "steps": [
+      "Select the system data operating area (SHIFT + SYSTEM ALARM).",
+      "Open the PLC status window via the softkeys PLC → PLC status.",
+      "Monitor DB1000.DBB3: the RESET key is DB1000.DBX3.5 and the CYCLE START key is DB1000.DBX3.3.",
+      "If the status bit changes when you press the key, the key works – look for other alarms or check the PLC program elsewhere.",
+      "If the status bit does not change when you press the key, the key is damaged – replacement and maintenance are needed."
+    ]
+  },
+  {
+    "id": "3.5-1",
+    "section": "3.5 Spindle fault",
+    "page": 15,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "Spindle does not move, the screen shows it is waiting for the spindle signal, no alarm",
+    "alarm_codes": [],
+    "alarm_text": "",
+    "steps": [
+      "Check machine data MD30200 (1 = spindle with encoder, 0 = spindle without encoder).",
+      "Analog spindle: check spindle interface X54 on the back of the PPU for looseness or damage, and after starting the spindle measure the voltage output between pins 1 and 9 of X54 with a multimeter.",
+      "Check that the connection cables of the PPU, spindle drive and encoder are in good condition.",
+      "Check machine data: MD30130 = 1; MD30240 encoder type (1 = motor encoder, 2 = external encoder via X60); MD30134 spindle output polarity (0 = dual polarity, 1/2 = single polarity, as applicable); MD32250 = 100 and MD32260 consistent with the rated motor speed.",
+      "Check whether the spindle drive has a fault.",
+      "If the fault still exists, the PPU is probably damaged – replacement and maintenance are needed."
+    ]
+  },
+  {
+    "id": "3.5-2",
+    "section": "3.5 Spindle fault",
+    "page": 15,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "Spindle speed values are shown on the screen but the spindle does not move, no alarm",
+    "alarm_codes": [],
+    "alarm_text": "",
+    "steps": [
+      "Check that the control is not in program test state: the program test LED on the MCP must be off and the PRT icon in the PPU program status bar must be deactivated.",
+      "If the fault still exists, carry out the checks for spindle fault case 1 (3.5-1): machine data MD30200/MD30130/MD30240/MD30134/MD32250, interface X54, connection cables and the spindle drive."
+    ],
+    "see_also": ["3.5-1"]
+  },
+  {
+    "id": "3.5-3",
+    "section": "3.5 Spindle fault",
+    "page": 16,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "Spindle speed is unstable and varies during rotation",
+    "alarm_codes": [],
+    "alarm_text": "",
+    "steps": [
+      "Check for interference between connection cables; route power cables and signal cables separately.",
+      "Analog spindle: check interface X54 on the back of the PPU for looseness, damage or bad contact.",
+      "Check whether the connection cable to the spindle drive is loose or the drive is damaged."
+    ]
+  },
+  {
+    "id": "3.6",
+    "section": "3.6 Spindle encoder alarm",
+    "page": 16,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "Spindle does not move and alarm 025000 (hardware fault of active encoder) is shown",
+    "alarm_codes": ["025000"],
+    "alarm_text": "Axis MSP1 hardware fault of active encoder",
+    "steps": [
+      "External spindle encoder: check spindle encoder interface X60 on the back of the PPU for looseness or damage.",
+      "Check whether the spindle encoder cable is damaged or connected incorrectly.",
+      "Check machine data MD30200 (number of encoders: 1 = with encoder, 0 = without) and MD30240 (encoder type: 1 = motor encoder, 2 = external encoder via X60).",
+      "Check whether the spindle encoder is damaged: replace it with a new one and test again.",
+      "If the fault still exists, the PPU is probably damaged – replacement and maintenance are needed."
+    ]
+  },
+  {
+    "id": "3.7",
+    "section": "3.7 Handwheel fault",
+    "page": 17,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "Handwheel does not work or cannot be assigned to an axis",
+    "alarm_codes": [],
+    "alarm_text": "",
+    "steps": [
+      "Check that the operating sequence is correct and that the feed axis is selected for handwheel assignment in handwheel mode; use PLC monitoring to test the input/output status of the selected axis traversing key.",
+      "Check the handwheel connections and look for short circuits between adjacent connections.",
+      "Check interface X10 on the back of the PPU: loose connection, damaged cable, and 5 V output at terminals 5/6.",
+      "Check whether the handwheel itself is damaged.",
+      "If the fault still exists, the PPU is probably damaged – replacement and maintenance are needed."
+    ]
+  },
+  {
+    "id": "3.8-1",
+    "section": "3.8 Feed axis fault",
+    "page": 17,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "Screen shows the feed axis moving but the axis does not actually move",
+    "alarm_codes": [],
+    "alarm_text": "",
+    "steps": [
+      "Check that the control is not in program test state: the program test LED on the MCP must be off and the PRT icon in the PPU program status bar must be deactivated.",
+      "Check whether the mechanical coupling is loose.",
+      "Check the connections between the control and the drives, and whether the drive terminals are damaged.",
+      "If the fault still exists, the PPU is probably damaged – replacement and maintenance are needed."
+    ]
+  },
+  {
+    "id": "3.8-2",
+    "section": "3.8 Feed axis fault",
+    "page": 18,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "Axis moves in the opposite direction to the one selected or shown on the screen",
+    "alarm_codes": [],
+    "alarm_text": "",
+    "steps": [
+      "Check machine data MD32100 (axis traversing direction, default 1, change to -1 if required) and MD32110 (encoder position feedback polarity, default 1, change to -1 if required).",
+      "SINUMERIK 808D: also check the +DIR and -DIR terminal connections on the drives."
+    ]
+  },
+  {
+    "id": "3.9",
+    "section": "3.9 Axis moving direction fault",
+    "page": 18,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "In JOG mode the axis moves only in one direction and the direction cannot be changed",
+    "alarm_codes": [],
+    "alarm_text": "",
+    "steps": [
+      "Check whether the corresponding drive is damaged."
+    ]
+  },
+  {
+    "id": "3.10",
+    "section": "3.10 Positioning error",
+    "page": 18,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "Positions in the machine coordinate system are inaccurate",
+    "alarm_codes": [],
+    "alarm_text": "",
+    "steps": [
+      "Check that machine data match the actual mechanics: MD31030 leadscrew pitch; MD31050/MD31060 denominator/numerator of the gear ratio; MD31020/MD31400 = 10000 encoder lines per revolution (SINUMERIK 808D only) – also check whether there is frequency multiplication on the drive encoder.",
+      "Check that the turret is installed properly on the machine.",
+      "Check whether the mechanical coupling is loose or the belt is slipping.",
+      "Check whether leadscrew pitch compensation and/or backlash compensation need adjusting."
+    ]
+  },
+  {
+    "id": "3.11-1",
+    "section": "3.11 Tool change fault",
+    "page": 19,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "Tool cannot be changed, the wrong tool is changed, or the turret keeps rotating",
+    "alarm_codes": [],
+    "alarm_text": "",
+    "steps": [
+      "Check the phase sequence of the machine power supply / turret motor connection.",
+      "Check the turret rotation output / turret in-position input interface on the back of the PPU: damage, loose wires, terminals 1 and 10 connected to 24 V and 0 V respectively, and wiring that matches the PLC program settings.",
+      "Check the wires between that interface and the turret for looseness or damage.",
+      "Check whether the turret signal encoder on the machine is damaged.",
+      "If the fault still exists, the PPU is probably damaged – replacement and maintenance are needed."
+    ]
+  },
+  {
+    "id": "3.11-2",
+    "section": "3.11 Tool change fault",
+    "page": 19,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "During tool change the tool arm does not return to its home position",
+    "alarm_codes": [],
+    "alarm_text": "",
+    "steps": [
+      "Check the PLC output signals related to the tool arm positions.",
+      "Check the PPU input signals related to the tool arm positions.",
+      "Note: this can be caused by interference on the turret signals from unstable supply voltage and contactor arcing."
+    ]
+  },
+  {
+    "id": "3.12",
+    "section": "3.12 Overload",
+    "page": 19,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "Axis cannot move or moves with difficulty because of overload; the drive may show an overload alarm",
+    "alarm_codes": [],
+    "alarm_text": "",
+    "steps": [
+      "Check that guide lubrication is sufficient: lubricating pipe/nozzle not blocked, lubrication interval not set too long.",
+      "Stop the machine and check whether the guides or screws are blocked by machining chips; clean them if needed.",
+      "Check that the shaft coupling runs smoothly and is concentric."
+    ]
+  },
+  {
+    "id": "3.13",
+    "section": "3.13 System crash during startup",
+    "page": 20,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "System crashes while starting up; the HMI usually freezes at about 40 %",
+    "alarm_codes": [],
+    "alarm_text": "",
+    "steps": [
+      "Power off, restart the control and check whether the fault is resolved.",
+      "Power off and check that the CF card is inserted correctly and has no bad contact, then power on again.",
+      "If the fault still exists, the PPU is probably damaged – replacement and maintenance are needed."
+    ]
+  },
+  {
+    "id": "3.14-1",
+    "section": "3.14 Hardware limit fault",
+    "page": 20,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "Hardware limit switch alarm (e.g. 021614) is shown on the PPU",
+    "alarm_codes": ["021614"],
+    "alarm_text": "Axis Z/MZ1 hardware limit switch +",
+    "steps": [
+      "Hold down the RESET key on the PPU while pressing the axis traversing key to move the axis in the opposite direction; the alarm clears once the axis has moved off the hardware limit switch.",
+      "If the fault still exists: check the hardware limit switch connection with a multimeter and check whether the limit switches are damaged."
+    ]
+  },
+  {
+    "id": "3.14-2",
+    "section": "3.14 Hardware limit fault",
+    "page": 20,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "Axis has passed the hardware limit but still moves without any alarm",
+    "alarm_codes": [],
+    "alarm_text": "",
+    "steps": [
+      "Check whether the hardware limit switch wire is short-circuited to the high-level signal.",
+      "Check whether the hardware limit switches are damaged."
+    ]
+  },
+  {
+    "id": "3.15-1",
+    "section": "3.15 Reference point approach fault",
+    "page": 21,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "During reference point approach the position values on the PPU do not change and the axis does not move",
+    "alarm_codes": ["004060", "004062", "004065"],
+    "alarm_text": "",
+    "steps": [
+      "Check whether there is an alarm on the PPU screen; clear it with the RESET key and continue.",
+      "If alarms 004060, 004062 and 004065 appear, the machine data has been lost: restore the backup data, power off and restart, then check whether the fault is gone."
+    ]
+  },
+  {
+    "id": "3.15-2",
+    "section": "3.15 Reference point approach fault",
+    "page": 21,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "During reference point approach the position values on the PPU change but the axis does not move",
+    "alarm_codes": [],
+    "alarm_text": "",
+    "steps": [
+      "Check that the control is not in program test state: the program test LED on the MCP must be off and the PRT icon in the PPU program status bar must be deactivated.",
+      "Check machine data: MD30130 = 2, MD30240 = 3, MD30350 = 0."
+    ]
+  },
+  {
+    "id": "3.15-3",
+    "section": "3.15 Reference point approach fault",
+    "page": 21,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "During reference point approach the axis keeps moving until the hardware limit switch alarm appears",
+    "alarm_codes": [],
+    "alarm_text": "",
+    "steps": [
+      "Check whether the machine deceleration switches or their connections are broken."
+    ]
+  },
+  {
+    "id": "3.15-4",
+    "section": "3.15 Reference point approach fault",
+    "page": 21,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "During reference point approach the axis always moves in the opposite direction",
+    "alarm_codes": [],
+    "alarm_text": "",
+    "steps": [
+      "Check whether the deceleration switches fail to spring back.",
+      "Check for a connection fault of the deceleration switches."
+    ]
+  },
+  {
+    "id": "3.15-5",
+    "section": "3.15 Reference point approach fault",
+    "page": 21,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "During reference point approach the axis moves only a short distance",
+    "alarm_codes": [],
+    "alarm_text": "",
+    "steps": [
+      "Check machine data MD34000 – the deceleration switches are not used when MD34000 = 0."
+    ]
+  },
+  {
+    "id": "3.15-6",
+    "section": "3.15 Reference point approach fault",
+    "page": 21,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "Alarm 20002 appears after the axis leaves the deceleration switch during reference point approach",
+    "alarm_codes": ["20002"],
+    "alarm_text": "",
+    "steps": [
+      "Check whether the machine approach switch and its connections are damaged.",
+      "Check that machine data MD34060 is set properly.",
+      "Check whether the feed axis encoder and its connections are damaged."
+    ]
+  },
+  {
+    "id": "3.15-7",
+    "section": "3.15 Reference point approach fault",
+    "page": 21,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "JOG and automatic program execution work normally, but nothing happens when approaching the reference point",
+    "alarm_codes": [],
+    "alarm_text": "",
+    "steps": [
+      "Check machine data MD30200 – the reference point cannot be approached when MD30200 = 0."
+    ]
+  },
+  {
+    "id": "3.15-8",
+    "section": "3.15 Reference point approach fault",
+    "page": 21,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "After reference point approach the axis position is off by one leadscrew pitch",
+    "alarm_codes": [],
+    "alarm_text": "",
+    "steps": [
+      "Check that machine data MD31020 is set correctly.",
+      "Alternatively, adjust the reference cam switch by 2 to 3 mm."
+    ]
+  },
+  {
+    "id": "3.16-A05",
+    "section": "3.16 Drive alarm",
+    "page": 22,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "Drive alarm; the drive shows A05/A06 (SINAMICS V60) or F30001 (SINAMICS V70): IGBT or internal chip overcurrent",
+    "alarm_codes": ["025201", "A05", "A06", "F30001"],
+    "alarm_text": "Axis MX1 drive fault",
+    "steps": [
+      "Check the U, V, W and PE connections on the drive: short circuits between phases, a disconnected U/V/W phase, incorrect or poor grounding, damaged wires.",
+      "Power on again and check whether the fault still exists.",
+      "If it does, check the motor insulation for damage and replace the motor if necessary; power on again and check.",
+      "If the fault still exists, the drive is probably damaged – replacement and maintenance are needed."
+    ]
+  },
+  {
+    "id": "3.16-A07",
+    "section": "3.16 Drive alarm",
+    "page": 22,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "Drive alarm; the drive shows A07 (SINAMICS V60) or F30002 (SINAMICS V70): ground connection short-circuited",
+    "alarm_codes": ["025201", "A07", "F30002"],
+    "alarm_text": "Axis MX1 drive fault",
+    "steps": [
+      "Check the U, V, W and PE connections on the drive for short circuits between phases.",
+      "Power on again and check whether the fault still exists.",
+      "If the fault still exists, the IGBT module in the drive is probably damaged – replacement and maintenance are needed."
+    ]
+  },
+  {
+    "id": "3.16-A08",
+    "section": "3.16 Drive alarm",
+    "page": 22,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "Drive alarm; the drive shows A08: incorrect encoder U/V/W connections",
+    "alarm_codes": ["025201", "A08"],
+    "alarm_text": "Axis MX1 drive fault",
+    "steps": [
+      "Check the signal cable between the motor and the drive (drive to motor encoder): faulty internal contacts, poor cable shielding, shield ground connected correctly.",
+      "Power on again and check whether the fault still exists.",
+      "If it does, check the connection of the encoder interface.",
+      "If the fault still exists, the motor encoder is probably damaged – replacement and maintenance are needed."
+    ]
+  },
+  {
+    "id": "3.16-A09",
+    "section": "3.16 Drive alarm",
+    "page": 23,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "Drive alarm; the drive shows A09 (SINAMICS V60) or F31117 (SINAMICS V70): encoder TTL pulse fault",
+    "alarm_codes": ["025201", "A09", "F31117"],
+    "alarm_text": "Axis MX1 drive fault",
+    "steps": [
+      "Check the signal cable between the motor and the drive (drive to motor encoder): correct encoder cable connection, faulty internal contacts, poor cable shielding, shield ground connected correctly.",
+      "Power on again and check whether the fault still exists.",
+      "If it does, check the connection of the encoder interface.",
+      "If the fault still exists, the motor encoder is probably damaged – replacement and maintenance are needed."
+    ]
+  },
+  {
+    "id": "3.16-F7452",
+    "section": "3.16 Drive alarm",
+    "page": 23,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "Drive alarm; the drive shows F7452 (following error out of tolerance) or F7011/A7012 (motor overload)",
+    "alarm_codes": ["025201", "F7452", "F7011", "A7012"],
+    "alarm_text": "Axis MX1 drive fault",
+    "steps": [
+      "Check whether the cutting load is too high, or whether the spindle stops while the axes are still moving.",
+      "Milling machine: check whether the counterbalance for axis Z is too light or its pressure is too low.",
+      "Check whether the encoder cable is loose."
+    ]
+  },
+  {
+    "id": "3.17",
+    "section": "3.17 Option activation failure after PPU replacement",
+    "page": 23,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "After replacing the PPU, previously purchased options cannot be activated because the old license key is invalid",
+    "alarm_codes": [],
+    "alarm_text": "",
+    "steps": [
+      "Recommended: after the first power-up with the new PPU, import the commissioning archive created with the previous PPU.",
+      "Contact the Siemens Hotline to unassign the option licenses.",
+      "On the PPU: SHIFT + SYSTEM ALARM → extended softkeys (>) → Serv. displ. → Version → License key; note the CF card serial number shown in the dialog.",
+      "On a PC with internet access, open the Web License Manager (www.siemens.com/automation/license), log in via \"Direct access\" and assign the purchased licenses to the new PPU; a license key is generated.",
+      "Enter the generated license key in the License key dialog and confirm with OK.",
+      "Press the Options softkey to check the licensing status, set the licensed options as required, then press NCK reset (po) to restart the NCK.",
+      "If the CNC lock function is used, further activation steps are needed (see 3.17-lock-1 / 3.17-lock-2)."
+    ]
+  },
+  {
+    "id": "3.17-lock-1",
+    "section": "3.17 Option activation failure after PPU replacement",
+    "page": 25,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "After PPU replacement, a commissioning archive made while CNC lock was deactivated was imported, and CNC lock must be activated again",
+    "alarm_codes": [],
+    "alarm_text": "",
+    "steps": [
+      "This is done by the machine manufacturer or dealer: a new activation file (.clc) must be created and imported.",
+      "In Access MyMachine on a PC: Tools → CNC lock function... → Activate.",
+      "Enter: software version 4.7 SP4; serial number of the new CF card (PPU: SHIFT + SYSTEM ALARM → > → Serv. displ. → Version → License key); serial number of the new PPU hardware (from the PPU rating plate); OEM PIN (8–32 characters, mixing upper and lower case letters, numbers and special characters, no spaces); lock date (last or new lock date).",
+      "Click Creating LockSet file... to save the .clc file, and store it on a USB stick or connected network drive.",
+      "On the PPU open the License key dialog (SHIFT + SYSTEM ALARM → > → Serv. displ. → Version → License key) and check that it shows \"CNC lock is activated: No lock data\".",
+      "Press Import File, select the directory with INPUT, select the activation file and confirm with OK.",
+      "If no error occurs, CNC lock is active and the lock date is shown on the HMI."
+    ]
+  },
+  {
+    "id": "3.17-lock-2",
+    "section": "3.17 Option activation failure after PPU replacement",
+    "page": 27,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "Alarm 8062 and NC start disabled after PPU replacement, because the imported commissioning archive was made while CNC lock was activated",
+    "alarm_codes": ["8062"],
+    "alarm_text": "",
+    "steps": [
+      "Cause: the new PPU and new CF card have new serial numbers. The machine manufacturer or dealer must create and import a deactivation file (.clc).",
+      "In Access MyMachine on a PC: Tools → CNC lock function... → Deactivate.",
+      "Enter: serial number of the new CF card, serial number of the new PPU hardware, and the originally assigned OEM PIN.",
+      "Click Creating LockSet file... to save the .clc file, and store it on a USB stick or connected network drive.",
+      "On the PPU open the License key dialog (SHIFT + SYSTEM ALARM → > → Serv. displ. → Version → License key), press Import File, select the directory with INPUT, select the deactivation file and confirm with OK.",
+      "If no error occurs, CNC lock is deactivated. To activate it again, a new activation file is needed (see 3.17-lock-1)."
+    ],
+    "see_also": ["3.17-lock-1"]
+  },
+  {
+    "id": "3.18-8060",
+    "section": "3.18 CNC lock alarms",
+    "page": 28,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "Alarm 8060 or 8061: the CNC lock .clc file contains incorrect data",
+    "alarm_codes": ["8060", "8061"],
+    "alarm_text": "",
+    "steps": [
+      "Check the alarm cause: cause 13 = .clc file version not supported; cause 14 = CF card serial number not correct; cause 15 = lock date invalid.",
+      "Correct the error in the .clc file with Access MyMachine (AMM) and import it again."
+    ]
+  },
+  {
+    "id": "3.18-8063",
+    "section": "3.18 CNC lock alarms",
+    "page": 28,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "Alarm 8063: reminder showing the remaining days before NC start is locked by CNC lock",
+    "alarm_codes": ["8063"],
+    "alarm_text": "",
+    "steps": [
+      "Contact the machine manufacturer or dealer to extend or deactivate the CNC lock function."
+    ]
+  },
+  {
+    "id": "3.18-8064",
+    "section": "3.18 CNC lock alarms",
+    "page": 28,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "Alarm 8064: CNC lock date reached, NC start is disabled",
+    "alarm_codes": ["8064"],
+    "alarm_text": "",
+    "steps": [
+      "Contact the machine manufacturer or dealer to deactivate the CNC lock function."
+    ]
+  },
+  {
+    "id": "3.18-8065",
+    "section": "3.18 CNC lock alarms",
+    "page": 28,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "Alarm 8065 after NC restart: a date earlier than the actual date was set, NC start is disabled",
+    "alarm_codes": ["8065"],
+    "alarm_text": "",
+    "steps": [
+      "Correct the date on the HMI and perform an NC restart again."
+    ]
+  },
+  {
+    "id": "3.18-8066",
+    "section": "3.18 CNC lock alarms",
+    "page": 28,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "Alarm 8066: the system date was set relative to the CNC lock date in a way that is not allowed",
+    "alarm_codes": ["8066"],
+    "alarm_text": "",
+    "steps": [
+      "If the date set is equal to or later than the lock date and no NC restart has been done yet: correct the date on the HMI.",
+      "If an NC restart has already been done, alarm 8064 is issued and NC start is disabled; the machine manufacturer must deactivate and/or reactivate CNC lock according to its status.",
+      "If a future date earlier than the lock date was set and no NC restart has been done yet: correct the date on the HMI.",
+      "If an NC restart has already been done, the future date is taken as the actual date and cannot be reset, which shortens the time until the lock date; the machine manufacturer must deactivate and/or reactivate CNC lock according to its status.",
+      "Detailed alarm descriptions are in the SINUMERIK 808D Diagnostics Manual."
+    ]
+  },
+  {
+    "id": "3.19",
+    "section": "3.19 OEM PIN forgotten for CNC lock",
+    "page": 29,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "The machine manufacturer or dealer has forgotten the OEM PIN for CNC lock and cannot create a valid activation file",
+    "alarm_codes": [],
+    "alarm_text": "",
+    "steps": [
+      "The machine manufacturer or dealer contacts the Siemens Hotline and provides: the license certificate (CoL) for the CNC lock option, the CF card serial number, the PPU hardware serial number and the CNC software version (PPU: SHIFT + SYSTEM ALARM → > → Serv. displ. → Version).",
+      "Import the activation file received from the Hotline into the control to unlock the machine.",
+      "Note: this unlocks only the PPU hardware, not the PLC project – the original PLC project for the machine must be available."
+    ]
+  },
+  {
+    "id": "4.1.1",
+    "section": "4.1.1 Alarm 700010",
+    "page": 32,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "Reminder, not a fault: the handwheel is active and assigned to an axis",
+    "alarm_codes": ["700010"],
+    "alarm_text": "Handheld unit active",
+    "plc": "DB1600.DBX1.2, subroutine MINI_HHU (SBR 41)",
+    "steps": [
+      "No action is required; the alarm disappears when the handwheel is deactivated or unassigned."
+    ]
+  },
+  {
+    "id": "4.1.2",
+    "section": "4.1.2 Alarm 700012",
+    "page": 32,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "Reminder, not a fault: the spindle is braking",
+    "alarm_codes": ["700012"],
+    "alarm_text": "Spindle being braked",
+    "plc": "DB1600.DBX1.4, subroutine SPINDLE (SBR 42)",
+    "steps": [
+      "Wait until spindle braking has finished; the alarm then disappears."
+    ]
+  },
+  {
+    "id": "4.1.3",
+    "section": "4.1.3 Alarm 700014",
+    "page": 32,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "Spindle gear change took longer than the time limit",
+    "alarm_codes": ["700014"],
+    "alarm_text": "Gear stage change timeout",
+    "plc": "DB1600.DBX1.6, subroutine GearChg1_Auto (SBR 49)",
+    "steps": [
+      "Check whether the gear change monitoring time is set too short.",
+      "Check the spindle gearbox for mechanical problems."
+    ]
+  },
+  {
+    "id": "4.1.4",
+    "section": "4.1.4 Alarm 700015",
+    "page": 33,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "Control receives no gear level signal or the wrong gear level signal",
+    "alarm_codes": ["700015"],
+    "alarm_text": "Gear position signal error",
+    "plc": "DB1600.DBX1.7, subroutine GearChg1_Auto (SBR 49)",
+    "steps": [
+      "Use PLC monitoring to check whether there is an input signal at the gear level signal input.",
+      "Check whether the input terminals of that interface on the back of the PPU are damaged or loose.",
+      "Check the spindle gearbox for mechanical problems."
+    ]
+  },
+  {
+    "id": "4.1.5",
+    "section": "4.1.5 Alarm 700016",
+    "page": 33,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "Drive is not ready for operation; always appears together with an emergency stop alarm",
+    "alarm_codes": ["700016"],
+    "alarm_text": "Drives not ready",
+    "plc": "DB1600.DBX2.0, subroutine EMG_STOP (SBR 33)",
+    "steps": [
+      "Check whether an emergency stop alarm is active on the control, which causes this alarm.",
+      "Check whether the drive has an alarm, is not started, or is damaged.",
+      "SINAMICS V60 drive: also check terminal X6 for loose or broken wires and faults at pins 65 and M24."
+    ]
+  },
+  {
+    "id": "4.1.6",
+    "section": "4.1.6 Alarm 700018",
+    "page": 34,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "Coolant motor is overloaded and the coolant function does not work",
+    "alarm_codes": ["700018"],
+    "alarm_text": "Cooling motor overload",
+    "plc": "DB1600.DBX2.2, subroutine COOLING (SBR 44)",
+    "steps": [
+      "Check whether the overload protection switch of the coolant motor works.",
+      "Check interface X102 on the back of the PPU: pin 7 connection loose or broken, pin 10 properly connected to 0 V."
+    ]
+  },
+  {
+    "id": "4.1.7",
+    "section": "4.1.7 Alarm 700021",
+    "page": 34,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "Lubricating oil level in the oil box is below the minimum; risk of mechanical damage",
+    "alarm_codes": ["700021"],
+    "alarm_text": "Lubricant level too low",
+    "plc": "DB1600.DBX2.5, subroutine LUBRICAT (SBR 45)",
+    "steps": [
+      "Check whether the lubricating oil level is too low and add lubricating oil promptly.",
+      "Check the relevant interfaces on the back of the PPU: input terminals damaged or loose, pin 10 properly connected to 0 V."
+    ]
+  },
+  {
+    "id": "4.1.8",
+    "section": "4.1.8 Alarm 700029",
+    "page": 35,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "Reminder, not a fault: the first preset maintenance task is due soon",
+    "alarm_codes": ["700029"],
+    "alarm_text": "Warning: the 1st maintenance task will expire",
+    "plc": "DB1600.DBX3.5, subroutine PI_SERVICE (SBR 46)",
+    "steps": [
+      "Check the preset service maintenance plan and make the necessary preparations.",
+      "Select the system data operating area (SHIFT + SYSTEM ALARM).",
+      "Press the > key for the extended softkeys.",
+      "Open the service planning screen with the Serv. planr. softkey.",
+      "Press the Task completed softkey to cancel the alarm."
+    ]
+  },
+  {
+    "id": "4.1.9",
+    "section": "4.1.9 Alarm 700030",
+    "page": 35,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "The first preset maintenance task is now due and must be carried out immediately",
+    "alarm_codes": ["700030"],
+    "alarm_text": "Alarm: the 1st maintenance task has expired",
+    "plc": "DB1600.DBX3.6, subroutine PI_SERVICE (SBR 46)",
+    "steps": [
+      "Select the system data operating area (SHIFT + SYSTEM ALARM).",
+      "Press the > key for the extended softkeys.",
+      "Open the service planning screen with the Serv. planr. softkey.",
+      "After carrying out the service plan, press the Task completed softkey to cancel the alarm."
+    ]
+  },
+  {
+    "id": "4.1.10",
+    "section": "4.1.10 Alarm 700060",
+    "page": 35,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "Program test state cannot be changed while a program is running; the channel must be reset first",
+    "alarm_codes": ["700060"],
+    "alarm_text": "PRT/AFL change not possible: channel not reset",
+    "plc": "DB1600.DBX7.4, subroutine MCP_NCK (SBR 37)",
+    "steps": [
+      "Press ALARM CANCEL on the PPU to cancel the alarm; the program continues.",
+      "Alternatively press RESET on the MCP to cancel the alarm; note that this also resets the program execution."
+    ]
+  },
+  {
+    "id": "4.2.1",
+    "section": "4.2.1 Alarm 700019",
+    "page": 36,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "machine": "milling",
+    "symptom": "Coolant level in the machine is below the minimum; risk of mechanical damage",
+    "alarm_codes": ["700019"],
+    "alarm_text": "Coolant level too low",
+    "plc": "DB1600.DBX2.3, subroutine COOLING (SBR 44)",
+    "steps": [
+      "Check whether the coolant level is too low and add coolant promptly.",
+      "Check interface X102 on the back of the PPU: pin 6 connection loose or broken, pin 10 properly connected to 0 V."
+    ]
+  },
+  {
+    "id": "4.2.2",
+    "section": "4.2.2 Alarm 700020",
+    "page": 36,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "machine": "milling",
+    "symptom": "Lubrication motor is overloaded and the lubrication function does not work",
+    "alarm_codes": ["700020"],
+    "alarm_text": "Lubricating motor overload",
+    "plc": "DB1600.DBX2.4, subroutine LUBRICAT (SBR 45)",
+    "steps": [
+      "Check whether the overload protection switch of the lubrication motor works.",
+      "Check the relevant interfaces on the back of the PPU: input terminals damaged or loose, pin 10 properly connected to 0 V."
+    ]
+  },
+  {
+    "id": "4.2.3",
+    "section": "4.2.3 Alarm 700031",
+    "page": 37,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "machine": "milling",
+    "symptom": "Tool magazine is detected in neither the spindle position nor the original position; tool change stops",
+    "alarm_codes": ["700031"],
+    "alarm_text": "Magazine not in spindle pos. or original pos.",
+    "plc": "DB1600.DBX3.7, subroutine DISK_MGZ_M (SBR 60)",
+    "steps": [
+      "Check interface X101 on the back of the PPU: input state of I1.3/I1.4 via PLC status monitoring, pins 5 and 6 loose or broken, pin 10 properly connected to 0 V.",
+      "Check whether the switches that detect the magazine's extended and retracted limits are faulty.",
+      "After the magazine has returned to the correct position, press RESET on the MCP to cancel the alarm."
+    ]
+  },
+  {
+    "id": "4.2.4",
+    "section": "4.2.4 Alarm 700032",
+    "page": 37,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "machine": "milling",
+    "symptom": "Tool magazine is detected in the spindle position and the original position at the same time; tool change stops",
+    "alarm_codes": ["700032"],
+    "alarm_text": "Magazine in spindle pos. and original pos.",
+    "plc": "DB1600.DBX4.0, subroutine DISK_MGZ_M (SBR 60)",
+    "steps": [
+      "Check interface X101 on the back of the PPU: input state of I1.3/I1.4 via PLC status monitoring, pins 5 and 6 loose or broken, pin 10 properly connected to 0 V.",
+      "Check whether the switches that detect the magazine's extended and retracted limits are faulty.",
+      "After the magazine has returned to the correct position, press RESET on the MCP to cancel the alarm."
+    ]
+  },
+  {
+    "id": "4.2.5",
+    "section": "4.2.5 Alarm 700033",
+    "page": 38,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "machine": "milling",
+    "symptom": "Magazine move key was pressed while the magazine or spindle was not ready; the magazine does not move",
+    "alarm_codes": ["700033"],
+    "alarm_text": "Magazine rot. failed: magazine/spindle not ready",
+    "plc": "DB1600.DBX4.1, subroutine DISK_MGZ_M (SBR 60)",
+    "steps": [
+      "Press RESET on the MCP to cancel the alarm.",
+      "Note: the magazine cannot move while the spindle is rotating, the magazine is rotating forward/reverse, the spindle is executing a tool release command, or emergency stop is active."
+    ]
+  },
+  {
+    "id": "4.2.6",
+    "section": "4.2.6 Alarm 700034",
+    "page": 38,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "machine": "milling",
+    "symptom": "Tool on the spindle is different from the tool in the program; the program cannot run",
+    "alarm_codes": ["700034"],
+    "alarm_text": "Blk search finds tool on spindle <> tool programed",
+    "plc": "DB1600.DBX4.2, subroutine DISK_MGZ_M (SBR 60)",
+    "steps": [
+      "Check that the tool number to be activated in the current program matches the tool currently loaded on the spindle.",
+      "Use the correct program search method to restart the program.",
+      "After eliminating the fault, press RESET on the MCP to cancel the alarm."
+    ]
+  },
+  {
+    "id": "4.2.7",
+    "section": "4.2.7 Alarm 700035",
+    "page": 39,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "machine": "milling",
+    "symptom": "Spindle tool release takes longer than the monitoring time and fails",
+    "alarm_codes": ["700035"],
+    "alarm_text": "Spindle positioning to unclamping position timeout",
+    "plc": "DB1600.DBX4.3, subroutine DISK_MGZ_M (SBR 60)",
+    "steps": [
+      "Check interface X101 on the back of the PPU: input state of I1.5 via PLC status monitoring, pin 7 loose or broken, pin 10 properly connected to 0 V.",
+      "Check that the tool release monitoring timer T19 in the PLC is set correctly.",
+      "Check that the air pressure is sufficient.",
+      "Check that the spindle tool release switch works normally.",
+      "After eliminating the fault, press RESET on the MCP to cancel the alarm."
+    ]
+  },
+  {
+    "id": "4.2.8",
+    "section": "4.2.8 Alarm 700036",
+    "page": 39,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "machine": "milling",
+    "symptom": "Spindle tool clamping takes longer than the monitoring time and fails",
+    "alarm_codes": ["700036"],
+    "alarm_text": "Spindle positioning to clamping position timeout",
+    "plc": "DB1600.DBX4.4, subroutine DISK_MGZ_M (SBR 60)",
+    "steps": [
+      "Check interface X101 on the back of the PPU: input state of I1.6 via PLC status monitoring, pin 8 loose or broken, pin 10 properly connected to 0 V.",
+      "Check that the tool clamping monitoring timer T20 in the PLC is set correctly.",
+      "Check that the air pressure is sufficient.",
+      "Check that the spindle tool clamping switch works normally.",
+      "After eliminating the fault, press RESET on the MCP to cancel the alarm."
+    ]
+  },
+  {
+    "id": "4.2.9",
+    "section": "4.2.9 Alarm 700059",
+    "page": 40,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "machine": "milling",
+    "symptom": "Part program cannot start because the safety door is not closed",
+    "alarm_codes": ["700059"],
+    "alarm_text": "NC start not possible: safety door not closed",
+    "plc": "DB1600.DBX7.3, subroutine AUX_MCP (SBR 20)",
+    "steps": [
+      "Check that the safety door is closed; if a safety door key on the MCP is used, check that it is activated.",
+      "Check interface X102 on the back of the PPU: pin 7 loose or broken, pin 10 properly connected to 0 V.",
+      "Check that the door-closed limit switch works normally.",
+      "After eliminating the fault, press RESET on the MCP to cancel the alarm."
+    ]
+  },
+  {
+    "id": "4.3.1",
+    "section": "4.3.1 Alarm 700013",
+    "page": 41,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "machine": "turning",
+    "symptom": "Chuck is not clamped; cycle start and spindle rotation are blocked",
+    "alarm_codes": ["700013"],
+    "alarm_text": "Operation not allowed: chuck unclamped",
+    "plc": "DB1600.DBX1.5, subroutine Lock_unlock_T (SBR 56)",
+    "steps": [
+      "Check that the chuck control key on the MCP is activated (indicator lit).",
+      "Check that the workpiece is clamped in the chuck.",
+      "Check interface X102 on the back of the PPU: pin 5 loose or broken, pin 10 properly connected to 0 V."
+    ]
+  },
+  {
+    "id": "4.3.2",
+    "section": "4.3.2 Alarm 700017",
+    "page": 41,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "machine": "turning",
+    "symptom": "Chuck was operated while the spindle or the part program was running",
+    "alarm_codes": ["700017"],
+    "alarm_text": "Chuck operation not allowed: spindle/prog. running",
+    "plc": "DB1600.DBX2.1, MAIN (OB1)",
+    "steps": [
+      "Press ALARM CANCEL on the PPU to cancel the alarm; the program continues.",
+      "Alternatively press RESET on the MCP to cancel the alarm; note that this also resets the program execution."
+    ]
+  },
+  {
+    "id": "4.3.3",
+    "section": "4.3.3 Alarm 700022",
+    "page": 41,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "machine": "turning",
+    "symptom": "Turret motor is overloaded; the turret and all operations are unavailable",
+    "alarm_codes": ["700022"],
+    "alarm_text": "Turret motor overload",
+    "plc": "DB1600.DBX2.6, MAIN (OB1)",
+    "steps": [
+      "Check whether the overload protection switch of the turret motor works.",
+      "Check interface X102 on the back of the PPU: pin 2 loose or broken, pin 10 properly connected to 0 V."
+    ]
+  },
+  {
+    "id": "4.3.4",
+    "section": "4.3.4 Alarm 700023",
+    "page": 42,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "machine": "turning",
+    "symptom": "Programmed tool position number is larger than the maximum tool position number",
+    "alarm_codes": ["700023"],
+    "alarm_text": "Prog. tool pos. number > max. tool pos. number",
+    "plc": "DB1600.DBX2.7, MAIN (OB1)",
+    "steps": [
+      "Check the part program and correct it according to the actual number of tools created."
+    ]
+  },
+  {
+    "id": "4.3.5",
+    "section": "4.3.5 Alarm 700024",
+    "page": 42,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "machine": "turning",
+    "symptom": "Maximum number of tools is set incorrectly on the control (should be 4 or 6)",
+    "alarm_codes": ["700024"],
+    "alarm_text": "Max. tool position number illegal",
+    "plc": "DB1600.DBX3.0, MAIN (OB1)",
+    "steps": [
+      "Check that machine data MD14510[20] (max. tool number) is set correctly."
+    ]
+  },
+  {
+    "id": "4.3.6",
+    "section": "4.3.6 Alarm 700025",
+    "page": 42,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "machine": "turning",
+    "symptom": "No position signals are detected from the turret",
+    "alarm_codes": ["700025"],
+    "alarm_text": "No tool position signal from turrent",
+    "plc": "DB1600.DBX3.1, MAIN (OB1)",
+    "steps": [
+      "Check the turret encoder and whether the turret signal interface is damaged.",
+      "Check whether the turret has a fault.",
+      "Check the corresponding I/O interface on the back of the PPU: connections disconnected or broken, terminals damaged or loose, pin 10 properly connected to 0 V."
+    ]
+  },
+  {
+    "id": "4.3.7",
+    "section": "4.3.7 Alarm 700026",
+    "page": 43,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "machine": "turning",
+    "symptom": "No tool position is detected within the time limit during tool change",
+    "alarm_codes": ["700026"],
+    "alarm_text": "Tool change timeout",
+    "plc": "DB1600.DBX3.2, MAIN (OB1)",
+    "steps": [
+      "Check the turret encoder and whether the turret signal interface is damaged.",
+      "Check whether the turret has a fault.",
+      "Check the corresponding I/O interface on the back of the PPU: connections disconnected or broken, terminals damaged or loose, pin 10 properly connected to 0 V.",
+      "Check that machine data MD14510[22] is set correctly; the value can be increased as appropriate."
+    ]
+  },
+  {
+    "id": "4.3.8",
+    "section": "4.3.8 Alarm 700028",
+    "page": 43,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "machine": "turning",
+    "symptom": "Control does not detect the tool clamp signal",
+    "alarm_codes": ["700028"],
+    "alarm_text": "Tool unclamped",
+    "plc": "DB1600.DBX3.4, subroutine Turret3_CODE_T (SBR 53)",
+    "steps": [
+      "Check whether the relevant input terminals on the back of the PPU are loose or damaged.",
+      "Check whether the connections of those input terminals are damaged or broken.",
+      "Use PLC monitoring to check whether there is a signal at the corresponding input."
+    ]
+  },
+  {
+    "id": "5.1",
+    "section": "5.1 G81 deactivated in ISO mode",
+    "page": 45,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "G81 does not work after switching the control to ISO mode",
+    "alarm_codes": [],
+    "alarm_text": "",
+    "steps": [
+      "Replace -ZSFR[0] with -ZSFR[10]: the tool change cycle uses -ZSFR[0], which by default conflicts with the ISO machine data."
+    ]
+  },
+  {
+    "id": "5.2-1",
+    "section": "5.2 M10/M11 deactivated",
+    "page": 45,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "In MDA mode M10 does not work and the chuck cannot be clamped",
+    "alarm_codes": [],
+    "alarm_text": "",
+    "steps": [
+      "The PLC program contains an interlock that blocks program execution while the chuck is released; the PLC subroutine must be modified.",
+      "Typically, with the chuck released, the spindle is not allowed to run CW or CCW in positioning or oscillating mode."
+    ]
+  },
+  {
+    "id": "5.2-2",
+    "section": "5.2 M10/M11 deactivated",
+    "page": 45,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "In AUTO mode M11 does not work and the chuck cannot be released",
+    "alarm_codes": [],
+    "alarm_text": "",
+    "steps": [
+      "Program a dwell of at least 2 seconds between M5 and M11, for example: M5 (spindle stop), G4F2 (2 s dwell), M11 (chuck release)."
+    ]
+  },
+  {
+    "id": "5.3",
+    "section": "5.3 Thread cutting interruption",
+    "page": 45,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "Internal thread cutting stops before the cycle is finished; no alarm and the spindle keeps running",
+    "alarm_codes": [],
+    "alarm_text": "",
+    "steps": [
+      "Check the value format of CYCLE99 parameter APP (run-in path, without sign): a decimal point may have been entered between the two commas for APP."
+    ]
+  },
+  {
+    "id": "5.4",
+    "section": "5.4 Wrong zero offsets in ISO mode",
+    "page": 46,
+    "source": "SINUMERIK_808D_Service_Manual_A5E41986997.pdf",
+    "symptom": "Zero offset activated in ISO mode cannot be reset to zero after switching back to Siemens mode",
+    "alarm_codes": [],
+    "alarm_text": "",
+    "steps": [
+      "Select the Machine operating area.",
+      "Switch to MDA mode.",
+      "Enter in the block editor: G291 and then G50.3 X0 Z0.",
+      "Press CYCLE START on the MCP; the zero offset previously activated in ISO mode is reset to zero."
+    ]
+  }
+]
