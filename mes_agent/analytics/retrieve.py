@@ -2,7 +2,7 @@
 import chromadb
 from sentence_transformers import SentenceTransformer
 from api.config import settings
-from mes_agent.analytics.load_data import CODE_PATTERN, load_fault_codes
+from pipelines.load_data import load_fault_codes, CODE_PATTERN 
 import re
 
 

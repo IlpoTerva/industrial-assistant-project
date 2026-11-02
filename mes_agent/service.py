@@ -11,11 +11,10 @@ from langgraph.types import Command
 from typing import Any
 
 from mes_agent.chat_lang import GRAPH, SYSTEM_PROMPT
-from mes_agent.tools import tool_get_date
 from api.schemas import ChatResponse
 
 def _build_message(message: str, history: list[dict[str, Any]]) -> list[AnyMessage]:
-    messages: list[AnyMessage] = [SystemMessage(content=SYSTEM_PROMPT + f"\n\nToday's date: {tool_get_date()}")]
+    messages: list[AnyMessage] = [SystemMessage(content=SYSTEM_PROMPT)]
     for item in (history or [])[-6:]:
         role = item.get("role")
         content = item.get("content")
@@ -54,6 +53,7 @@ def stream_chat_response(message: str, session_id: str, choice_id: str | None = 
             yield {"type": "stage", **chunk}
 
     snap = GRAPH.get_state(cfg)
+    #NOTE fix this, no need for interrupts in the agent loop
     interrupts = [i for task in snap.tasks for i in task.interrupts]
 
     if interrupts:
@@ -62,13 +62,3 @@ def stream_chat_response(message: str, session_id: str, choice_id: str | None = 
             resp = _answer_response(snap.values)
 
     yield {"type": "result", "data": resp.model_dump()}
-
-
-
-
-def generate_chat_response(message: str, history: list[dict[str, Any]]) -> dict[str, Any]:
-    final = GRAPH.invoke(_initial_state(message=message, history=history))
-    return {
-        "answer": final["answer"],
-        "tool_calls": final["tool_calls_log"],
-    }
