@@ -1,9 +1,15 @@
 """
 Simple vector index framework for initial testing and development. This is a basic implementation that allows you to create a vector index from a set of documents and perform similarity searches.
 """
+from __future__ import annotations
+
+import sys
 
 from pathlib import Path
 from typing import Iterable, Optional, Any
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 from api.config import settings
 import re
 from collections import Counter
@@ -204,8 +210,46 @@ def build_cases() -> None:
     col.add(ids=ids, embeddings=[e.tolist() for e in embeddings], documents=docs, metadatas=metas)
     print(f"  cases: {len(cases)} indexed into {CASES_COLLECTION}")
 
+MD_COLLECTION = settings.COMMON_COLLECTION
+
+from pipelines.load_data import load_fault_codes, load_fault_logs, load_instructions
+
+def build_md():
+    import chromadb
+    from sentence_transformers import SentenceTransformer
+    client = chromadb.PersistentClient(path=CHROMA_PATH)
+    try:                                   
+        client.delete_collection(MD_COLLECTION)
+    except Exception:
+        pass
+    col = client.create_collection(MD_COLLECTION, metadata={"hnsw:space": "cosine"})
+
+    _, code_records = load_fault_codes()
+    records = load_instructions() + code_records + load_fault_logs()
+    if not records:
+        raise SystemExit("No data found — check the paths in the Config section.")
+
+    ids   = [r[0] for r in records]
+    docs  = [r[1] for r in records]
+    metas = [r[2] for r in records]
+
+    model = SentenceTransformer(EMBED_MODEL)
+    embeddings = model.encode([PASSAGE_PREFIX + d for d in docs], normalize_embeddings=True)
+    col.add(ids=ids, documents=docs, metadatas=metas, embeddings=embeddings)
+    print(f"Indexed {len(ids)} chunks "
+          f"({sum(m['source_type']=='instruction' for m in metas)} instr, "
+          f"{sum(m['source_type']=='code' for m in metas)} codes, "
+          f"{sum(m['source_type']=='log' for m in metas)} logs).")
 
 def build_all():
     build_cases()
     build()
+    build_md()
+
+
+def main():
+    build_all()
+
+if __name__ =="__main__":
+    main()
     
