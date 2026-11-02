@@ -33,7 +33,7 @@ class Settings:
 
     RAG_TOP_K = int(os.getenv("RAG_TOP_K", "5"))
     RAG_SCORE_FLOOR = float(os.getenv("RAG_SCORE_FLOOR", "0.75"))
-    CASES_JSON = os.getenv("TROUBLESHOOT_CASES_JSON", "data/cases.json")
+    CASES_JSON = os.getenv("TROUBLESHOOT_CASES_JSON", "data/raw/cases.json")
 
 
     TS_MARGIN = os.getenv("TS_MARGIN", "0.05")

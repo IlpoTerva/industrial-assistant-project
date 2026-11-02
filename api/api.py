@@ -1,8 +1,8 @@
 from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
-from app.schemas import ChatRequest
+from api.schemas import ChatRequest
 import json
-from app.registry import _pick_agent, AGENTS
+from api.registry import _pick_agent, AGENTS
 router = APIRouter()
 
 
