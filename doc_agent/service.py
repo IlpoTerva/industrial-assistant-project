@@ -39,10 +39,10 @@ def _choice_response(payload: dict, state: dict) -> ChatResponse:
         blocks=[{"type":"choices", "prompt": payload["question"], "options": options}]
     )
 
-def stream_chat_response(message: str, session_id: str, choide_id: str | None = None):
+def stream_chat_response(message: str, session_id: str, choice_id: str | None = None):
     cfg = {"configurable": {"thread_id": session_id}}
     if GRAPH.get_state(cfg).next:
-        graph_input = Command(resume=choide_id or message)
+        graph_input = Command(resume=choice_id or message)
     else:
         graph_input = _initial_state(message=message)
 

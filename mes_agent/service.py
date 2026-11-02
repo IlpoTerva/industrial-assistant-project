@@ -45,16 +45,21 @@ def _answer_response(state: dict) -> ChatResponse:
         blocks=[{"type": "text", "text": state["answer"]}],#TODO add sources.
     )
 
-def stream_chat_response(message: str, session_id: str, choide_id: str | None = None):
+def stream_chat_response(message: str, session_id: str, choice_id: str | None = None):
     cfg = {"configurable": {"thread_id": session_id}}
-    graph_input = _initial_state(message=message)
+    graph_input = _initial_state(message=message, history=[])
 
     for chunk in GRAPH.stream(graph_input, cfg, stream_mode="custom"):
         if "stage" in chunk:
             yield {"type": "stage", **chunk}
 
     snap = GRAPH.get_state(cfg)
-    resp = _answer_response(snap.values)
+    interrupts = [i for task in snap.tasks for i in task.interrupts]
+
+    if interrupts:
+        resp = _answer_response(payload=interrupts[0].value, state=snap.values)
+    else:
+            resp = _answer_response(snap.values)
 
     yield {"type": "result", "data": resp.model_dump()}
 
