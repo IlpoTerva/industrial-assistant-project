@@ -1,8 +1,8 @@
 
 import chromadb
 from sentence_transformers import SentenceTransformer
-from app.config import settings
-from analytics.load_data import CODE_PATTERN, load_fault_codes
+from api.config import settings
+from mes_agent.analytics.load_data import CODE_PATTERN, load_fault_codes
 import re
 
 

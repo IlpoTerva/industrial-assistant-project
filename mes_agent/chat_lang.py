@@ -6,11 +6,12 @@ from langchain_core.messages import (AnyMessage,
                                      ToolMessage)
 from langchain_openai import ChatOpenAI
 from langgraph.graph import END, START, StateGraph
+from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.graph.message import add_messages
 from langgraph.config import get_stream_writer
 
 import operator
-from agent_tools_api import TOOL_SCHEMAS, DISPATCH
+from mes_agent.agent_tools_api import TOOL_SCHEMAS, DISPATCH
 from api.config import settings
 
 
@@ -235,7 +236,7 @@ def _build_graph()-> Any:
     g.add_edge("tools", "agent")
     g.add_edge("force_final", "finalize")
     g.add_edge("finalize", END)
-    return g.compile()
+    return g.compile(checkpointer=InMemorySaver())
 
 
 GRAPH = _build_graph()

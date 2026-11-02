@@ -1,5 +1,5 @@
 
-from analytics.load_data import normalize_code
+from mes_agent.analytics.load_data import normalize_code
 import pandas as pd
 import json
 

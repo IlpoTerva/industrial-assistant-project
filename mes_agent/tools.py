@@ -1,4 +1,4 @@
-from analytics.mes_analytics import (
+from mes_agent.analytics.mes_analytics import (
                                      most_common_codes_API,
                                      routings
                                     )

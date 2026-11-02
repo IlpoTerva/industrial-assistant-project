@@ -2,7 +2,7 @@ from mes_agent.tools import (
     tool_get_most_common_codes_API,
     tool_get_routings
     )
-from analytics.retrieve import retrieve
+from mes_agent.analytics.retrieve import retrieve
 from typing import Callable, Any
 
 def _r(result: dict[str, any]):
