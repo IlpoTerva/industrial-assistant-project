@@ -1,0 +1,18 @@
+fault_code,title,category,mean_minutes
+E101,Tool Breakage,tooling,25
+E110,Tool Wear / Out of Tolerance,tooling,20
+E120,Spindle Overload,mechanical,30
+E130,Axis Alarm / Crash,mechanical,40
+E140,NC Program / CAM Error,process,22
+E150,Fixture / Workholding Error,process,18
+E160,Coolant System Fault,mechanical,15
+E205,Laser Optics / Nozzle Fault,mechanical,28
+E210,Bend Angle Out of Spec,quality,16
+E305,Weld Porosity / Defect,quality,24
+E310,Weld Distortion / Rework,quality,30
+E405,Burr / Surface Finish Reject,quality,12
+E410,Changeover / Setup Delay,changeover,35
+E505,Wrong Material / Grade Loaded,material,14
+E510,Material / Stock Shortage,material,20
+E520,Dimensional NC at Inspection,quality,18
+E601,Emergency Stop Triggered,safety,10
