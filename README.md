@@ -24,7 +24,7 @@ Langgraph, Ollama (qwen2.5:14b-instruct)
 
 ---
 
-##Data
+## Data
 
 Document agents data is real Siemens manuals and troubleshooting guides
 MES data is synthetic made for this project.
