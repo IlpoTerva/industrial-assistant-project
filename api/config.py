@@ -41,7 +41,7 @@ class Settings:
     # ---- Agent loop ----
     MAX_TOOL_ITERS = int(os.getenv("MAX_TOOL_ITERS", "6"))
 
-    DATA_ENDPOINT = os.getenv("DATA_ENDPOINT", "http://localhost:8000") #MES endpoint
+    DATA_ENDPOINT = os.getenv("DATA_ENDPOINT", "http://localhost:3000") #MES endpoint
     FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN", "http://localhost:5173")
     
     VOICE_DIR = {

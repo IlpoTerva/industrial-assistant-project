@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import router
-from app.config import settings
-from app.registry import _embed_query
+from api.api import router
+from api.config import settings
+from api.registry import _embed_query
 
 app = FastAPI(title="chat backend")
 print("Loading vector index and embedding model...")

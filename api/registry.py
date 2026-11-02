@@ -1,7 +1,7 @@
 from api.config import settings
 
-from mes_agent.chat_lang import stream_chat_response as mes_agent #TODO
-from doc_agent.chat_lang import stream_chat_response as doc_agent
+from mes_agent.service import stream_chat_response as mes_agent #TODO
+from doc_agent.service import stream_chat_response as doc_agent
 
 QUERY_PREFIX = "query: "
 
@@ -9,6 +9,7 @@ AGENTS = {"docs": doc_agent, "mes": mes_agent}
 MODE_TO_AGENT = {"manual": "docs", "troubleshooting": "docs", "mes": "mes"}
 
 MES_WORDS = ("oee", "scrap", "downtime", "order", "work center", "setup time") #NOTE add more
+_model = None
 
 def _pick_agent(mode: str, message: str):
     if mode in MODE_TO_AGENT:
