@@ -1,9 +1,9 @@
-### Shop floor assistant
+# Shop floor assistant
 
-##Two agents:
+## Two agents:
 
 
-# MES-agent
+### MES-agent
 
 Analyze MES data.
 
@@ -12,7 +12,7 @@ Two kinds of tools now:
  most common: Find what faults have occurred the most, which workstation has caused the most downtime etc.
 
 
-#Document agent
+### Document agent
 
 Can retrieve and answer to users questions related to machines
 and troubleshoot issues with the machines
