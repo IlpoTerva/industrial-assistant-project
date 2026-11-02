@@ -30,23 +30,5 @@ Document agents data is real Siemens manuals and troubleshooting guides
 MES data is synthetic made for this project.
 
 
----
 
-## Usage
-Note MES-api has not been uploaded yet, so document agent works only.
-
-### Prerequisites
- - Install requirements
- pip install -r requirements.txt (NOTE not added)
-
- - Build the documents
-python pipelines/build_vector_index.py
-
-### Frontend
-
-npm run dev
-
-### Backend
-
-uvicorn api.app:main 
 
