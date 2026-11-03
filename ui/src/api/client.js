@@ -24,7 +24,10 @@
 //   { type: "choices", prompt, options: { id, label, detail }[] }
 //   { type: "table",   tool, columns: string[], rows: (string|number)[][] }
 
+
 const API_URL = '/api/chat/stream';
+
+
 
 // Progress labels shown while the pipeline works. With a streaming backend (SSE),
 // send these as events from the LangGraph nodes instead of faking them here.

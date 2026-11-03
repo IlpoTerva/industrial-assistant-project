@@ -10,7 +10,7 @@ function useClock() {
   return now;
 }
 
-export default function StatusBar({ station, serverOnline, sampleData, theme, onToggleTheme, textScale, onTextScale, onNewSession }) {
+export default function StatusBar({ station, serverOnline, theme, onToggleTheme, textScale, onTextScale, onNewSession }) {
   const now = useClock();
   const time = now.toLocaleTimeString('fi-FI', { hour: '2-digit', minute: '2-digit' });
   const date = now.toLocaleDateString('fi-FI', { day: 'numeric', month: 'numeric' });
@@ -30,7 +30,6 @@ export default function StatusBar({ station, serverOnline, sampleData, theme, on
           <span className="pill__dot" />
           {serverOnline ? 'Server online · local network' : 'Server offline'}
         </span>
-        {sampleData && <span className="pill pill--warn">Sample data</span>}
       </div>
 
       <div className="statusbar__controls">

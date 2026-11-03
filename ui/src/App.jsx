@@ -128,7 +128,6 @@ export default function App() {
       <StatusBar
         station={STATION}
         serverOnline
-        sampleData
         theme={effectiveTheme}
         onToggleTheme={() => {
           const next = effectiveTheme === 'dark' ? 'light' : 'dark';
