@@ -482,3 +482,14 @@ button.figure__frame:hover { border-color: var(--accent); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+.pipeline { list-style: none; margin: 0; flex-direction: column; gap: 0.35rem; }
+.pipeline__step { gap: 0.6rem; }
+.pipeline__step.is-running { color: var(--accent); }
+.pipeline__step.is-running .pipeline__dot { background: var(--accent); animation: pulse 0.9s ease-in-out infinite alternate; }
+.pipeline__step.is-done { color: var(--fg); }
+.pipeline__step.is-done .pipeline__dot { background: var(--ok); border-color: var(--ok); }
+.pipeline__step.is-error { color: var(--alarm); }
+.pipeline__step.is-error .pipeline__dot { background: var(--alarm); border-color: var(--alarm); }
+.pipeline__detail { font-family: var(--font-ui); font-weight: 400; color: var(--fg-muted); }
+.pipeline__ms { margin-left: auto; font-family: var(--font-code); font-variant-numeric: tabular-nums; color: var(--fg-muted); }

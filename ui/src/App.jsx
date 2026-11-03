@@ -25,16 +25,18 @@ function writePref(key, value) {
 }
 
 function PipelineStatus({ stages }) {
-  const items = stages.length ? stages : ['Starting']
+  const items = stages.length ? stages : [{id: 'start', label: 'Starting', status: 'running'}];
   return (
-    <div className="pipeline" role="status" aria-live="polite">
-      {items.map((label, i) => (
-        <span key={i} className={`pipeline__step ${i < items.length - 1 ? 'is-done' : 'is-active'}`}>
+    <ol className="pipeline" role="status" aria-live="polite">
+      {items.map((s) => (
+        <li key={s.id} className={`pipeline__step is-${s.status}`}>
         <span className="pipeline__dot" />
-          {label}
-        </span>
+        <span className="pipeline__label">{s.label}</span>
+        {s.detail && <span className='pipeline__detail'>{s.detail}</span>}
+        {s.ms != null && <span className="pipeline__ms">{(s.ms / 100).toFixed(1)}</span>}
+        </li>
       ))}
-    </div>
+    </ol>
   );
 }
 
@@ -89,8 +91,17 @@ export default function App() {
     try {
       const res = await sendMessage(
         {message: text, sessionId, mode, choiceId}, 
-        (e) => {setStages((s) => [...(s ?? []), e.label])}
-      );
+        (e) => setStages((s) => {
+        const list = s ?? [];
+        if (!e.id) {                                   // old-style event (docs agent): previous steps are done
+          return [...list.map((x) => ({ ...x, status: 'done' })), { ...e, id: `${e.stage}-${list.length}`, status: 'running' }];
+        }
+        const i = list.findIndex((x) => x.id === e.id);
+        if (i === -1) return [...list, e];
+        const next = list.slice();
+        next[i] = { ...next[i], ...e };
+        return next;
+      }))
       const id = newId();
       setMessages((m) => [...m, { id, role: 'assistant', ...res }]);
       setFocusId(id);

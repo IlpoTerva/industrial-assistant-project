@@ -175,17 +175,19 @@ def classify_node(state: AgentState):
     return {"route": route}
 
 def manuals_node(state: AgentState):
-    emit(step_id="manual", label="Searching manuals")
+    emit(step_id="manual", label="Searching manuals", detail="Searching")
     print(f"[MANUAL NODE] query: {state['user_message']}" )
     ret = tool_retrieve(state["user_message"])
+    emit(step_id="manual", label="Searching manuals", detail="Done")
     return {"context": ret["result"].get("chunks", [])}
     
 
 def troubleshoot_node(state: AgentState):
-    emit(step_id="troubleshooting", label="Checking alarm causes")
+    emit(step_id="troubleshooting", label="Checking alarm causes", detail="Searching")
     query = state["query"] or state["user_message"]
     print(f"[TROUBLESHOOT] query: {query}")
     out = tool_troubleshoot_lookup(query, exclude=state["excluded"])["result"]
+    emit(step_id="troubleshooting", label="Checking alarm causes", detail="Done")
     candidates = out.get("candidates", [])
     return {"query":query, "candidates": candidates, "context": candidates}
 
