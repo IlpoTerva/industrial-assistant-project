@@ -7,6 +7,7 @@ router = APIRouter()
 
 
 
+
 @router.post("/api/chat/stream")
 def chat_stream(payload: ChatRequest):
     agent_name = _pick_agent(payload.mode, payload.message)

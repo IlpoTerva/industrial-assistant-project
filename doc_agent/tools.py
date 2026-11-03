@@ -1,11 +1,8 @@
-from doc_agent.retrieve import retrieve, retrieve_case
-from typing import Callable, Any
-import re
+from tools.retrieve_tools import retrieve_manuals, retrieve_case
+from typing import Any
 
 
-
-
-def _r(result: dict[str, any]):
+def _r(result: dict[str, Any]):
     return {"result": result}
 
 def _missing(param: str):
@@ -23,7 +20,7 @@ def tool_retrieve(query):
     print(f"[CALLING RETRIEVE] QUERY: {query}")
     if not query:
         return _missing("query")
-    return _r(retrieve(query))
+    return _r(retrieve_manuals(query))
 
 
 def tool_troubleshoot_lookup(query: str, exclude: list[str]|None = None):
@@ -38,5 +35,5 @@ def tool_troubleshoot_lookup(query: str, exclude: list[str]|None = None):
     return _r(retrieve_case(query=query, exclude=exclude))
 
 
-
+#NOTE not used since do not require tool calling
 TOOL_SCHEMAS = [tool_retrieve] #NOTE add more when more tools

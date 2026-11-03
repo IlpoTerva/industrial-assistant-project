@@ -1,4 +1,4 @@
-from mes_agent.analytics.tool_core import ANALYTICS, RETRIEVAL
+from tools.core import ANALYTICS, RETRIEVAL
 from langchain_core.tools import tool
 
 TOOLS = [tool(f, parse_docstring=True) for f in ANALYTICS + RETRIEVAL]

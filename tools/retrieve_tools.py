@@ -1,24 +1,25 @@
-from api.config import settings
-#from analytics.load_data import CODE_PATTERN, load_fault_codes
+
 from typing import Any
-import re
-import json
 from pathlib import Path
+import json
+
+from api.config import settings
+from pipelines.load_data import load_fault_codes, CODE_PATTERN 
+import re
+
+
 
 _collections = {}
 _model = None
 
 QUERY_PREFIX = "query: "
 
-
-# ---- HELPERS -----
 def _get_model():
     global _model
     if _model is None:
         from sentence_transformers import SentenceTransformer
         _model = SentenceTransformer(settings.EMBEDDING_MODEL)
     return _model
-
 
 def _get_collection(name: str):
     if name not in _collections:
@@ -33,10 +34,42 @@ def _embed_query(query: str) -> list[float]:
     vec = model.encode(QUERY_PREFIX + query, normalize_embeddings=True)
     return vec.tolist()
 
+def normalize_code(s: str) -> str:
+    return re.sub(r"[-_ ]", "", s.upper())
 
-# ----- RETRIEVE MANUALS ----
+# Retrieve data from fault_reference.md file.
 
-def retrieve(query):
+def retrieve_common(query, k=5):
+    try:
+        col = _get_collection(settings.COMMON_COLLECTION)
+    except Exception:
+        return {
+            "query": query,
+            "chunks": [],
+            "message": ("The document index has not been built yet")
+        }
+
+    code_lookup, _ = load_fault_codes()
+    codes = [normalize_code(c) for c in CODE_PATTERN.findall(query)]
+    ctx = {"exact_codes": [], "code_logs": [], "semantic": []}
+
+    for c in codes:
+        if c in code_lookup:
+            ctx["exact_codes"].append(code_lookup[c])
+
+    if codes:
+        res = col.query(
+            query_embeddings=[_embed_query(query)], n_results=k,
+            where={"$and": [{"source_type": "log"}, {"code_norm": {"$in": codes}}]},
+        )
+        ctx["code_logs"] = res["documents"][0]
+
+    res = col.query(query_embeddings=[_embed_query(query=query)], n_results=k)
+    ctx["semantic"] = res["documents"][0]
+    return ctx
+
+
+def retrieve_manuals(query):
     top_k = settings.RAG_TOP_K
 
     try:
@@ -78,7 +111,8 @@ def retrieve(query):
     
     return {"query": query, "chunks": chunks, "sources": sources}
 
-# ---- TROUBLESHOOT ALARMS; FAULTS -----
+
+# ---- TROUBLESHOOT ALARMS; FAULTS, from real manual -----
 
 ALARM_RE = re.compile(r"\b(?:\d{4,6}|[AF]\d{2,5}\b)")
 TROUBLE_WORDS = ("error", "alarm", "fault", "vika", "hälytys", "virhe")
@@ -96,6 +130,7 @@ def _load_cases(path: str):
     return  cases, alarm_index
 
 CASES, ALARMS = _load_cases(settings.CASES_JSON)
+
 def retrieve_case(query, exclude):
     top_k = settings.RAG_TOP_K
     exclude = exclude or set()
@@ -134,4 +169,3 @@ def retrieve_case(query, exclude):
     top = scored[0][1]
     close = [{**CASES[cid], "score": s} for cid, s in  scored if s >= top - float(settings.TS_MARGIN)]
     return {**base, "match": "symptom", "candidates": close[:int(settings.TS_OPTIONS_MAX)]}
-
