@@ -132,7 +132,6 @@ def _detect_language(text: str, fallback: str):
     
 
 def detect_lang_node(state: AgentState):
-    emit(step_id="language", label="Detecting language")
     return {"lang": _detect_language(state["user_message"], fallback=state.get("lang", "en"))}
 
 _PROTECT_RE = re.compile(
@@ -140,7 +139,9 @@ _PROTECT_RE = re.compile(
 )
 
 def _translate(text: str, target: str) -> str:
+    emit(step_id="translate", label="Translating text", detail=f"Translating to {target}")
     if not text.strip() or target == "en" and _detect_language(text=text, fallback="en") == "en":
+        emit(step_id="translate", label="Translating text", detail="Done")
         return text
     msgs = [
         SystemMessage(content=TRANSLATE_PROMPT.format(target=LANG_NAMES.get(target, target))),
@@ -152,6 +153,7 @@ def _translate(text: str, target: str) -> str:
         out = re.sub(r"<text>\s*|\s*<\text>$", "", out)
         if out and must_keep <= set(_PROTECT_RE.findall(out)):
             return out
+    emit(step_id="translate", label="Translating text", detail="Done")
     return text
 
 def translate_in_node(state: AgentState):

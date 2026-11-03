@@ -25,15 +25,15 @@ function writePref(key, value) {
 }
 
 function PipelineStatus({ stages }) {
-  const items = stages.length ? stages : [{id: 'start', label: 'Starting', status: 'running'}];
+  const items = stages.length ? stages : [{ id: 'start', label: 'Starting', status: 'running' }];
   return (
     <ol className="pipeline" role="status" aria-live="polite">
       {items.map((s) => (
         <li key={s.id} className={`pipeline__step is-${s.status}`}>
-        <span className="pipeline__dot" />
-        <span className="pipeline__label">{s.label}</span>
-        {s.detail && <span className='pipeline__detail'>{s.detail}</span>}
-        {s.ms != null && <span className="pipeline__ms">{(s.ms / 100).toFixed(1)}</span>}
+          <span className="pipeline__dot" />
+          <span className="pipeline__label">{s.label}</span>
+          {s.detail && <span className="pipeline__detail">{s.detail}</span>}
+          {s.ms != null && <span className="pipeline__ms">{(s.ms / 1000).toFixed(1)} s</span>}
         </li>
       ))}
     </ol>
