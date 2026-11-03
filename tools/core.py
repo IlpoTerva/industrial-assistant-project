@@ -95,3 +95,4 @@ def search_documents(query:str, k:int=5):
 
 ANALYTICS = [get_most_common_codes, get_routings]
 RETRIEVAL = [search_documents]
+ALL_TOOLS = [get_most_common_codes, get_routings, search_documents]

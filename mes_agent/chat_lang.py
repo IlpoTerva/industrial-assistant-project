@@ -12,7 +12,7 @@ from langgraph.config import get_stream_writer
 from pydantic import ValidationError
 
 import operator
-from mes_agent.tools import TOOLS, TOOLS_BY_NAME, ANALYTICS_TOOLS, RETRIEVAL_TOOLS
+from mes_agent.tools import  ANALYTICS_TOOLS, RETRIEVAL_TOOLS
 from tools.core import get_date
 from api.config import settings
 
@@ -77,7 +77,7 @@ Never use vague queries like "this fault" or "the problem above".
 """
 SYSTEM_PROMPT = SYSTEM_PROMPT_TEMPLATE.format(today=get_date())
 
-def _make_llm(with_tools:bool)-> Any:
+def _make_llm()-> Any:
     """Create a LangChain LLM instance with or without tools."""
     llm = ChatOpenAI(
         base_url=settings.OLLAMA_BASE_URL,
@@ -86,12 +86,9 @@ def _make_llm(with_tools:bool)-> Any:
         temperature=0,
     )
 
-    if with_tools:
-        llm = llm.bind_tools(tools=TOOLS)
     return llm
 
-LLM_TOOLS = _make_llm(with_tools=True)
-LLM_PLAIN = _make_llm(with_tools=False)
+
 
 _MAX_TOOL_RESULT_CHARS = 4000
 def _render_result(result: dict[str, Any]) -> str:
@@ -113,107 +110,12 @@ class AgentState(TypedDict):
     answer: str
     user_message: str
 
-    
-
-def agent_node(state: AgentState) -> dict[str, Any]:
-    get_stream_writer()({"stage": "tools", "label": "choosing tools"})
-    resp = LLM_TOOLS.invoke(state["messages"])
-    update: dict[str, Any] = {"messages": [resp], "steps": state["steps"]+1}
-    if not resp.tool_calls:
-        update["answer"] = (resp.content or "").strip()
-    return update
-
-def tools_node(state: AgentState):
-
-    last = state["messages"][-1]
-    print(f"[TOOL CALLS LOG] -> {state['tool_calls_log']} \n") #Debuggins print
-    seen = { 
-        (e["tool_name"], json.dumps(e["arguments"], sort_keys=True, default=str))
-        for e in state["tool_calls_log"]
-    }
-    has_analytics = any(tc["name"] in ANALYTICS_TOOLS for tc in last.tool_calls)
-    new_messages: list[AnyMessage] = []
-    log_adds: list[dict[str, Any]] = []
-    #src_adds: list[str] = [] #TODO add source (if retrieving where the answer is from)
-    for tc in last.tool_calls:
-        name = tc["name"]
-        args = tc.get("args") or {}
-        tc_id = tc["id"]
-
-        t = TOOLS_BY_NAME.get(name)
-        if t is None:
-            new_messages.append(ToolMessage(
-                content=f"Unknown tool '{name}'. Available tools: {','.join(TOOLS_BY_NAME)}",
-                tool_call_id=tc_id,
-            ))
-            continue
-        
-        if has_analytics and name in RETRIEVAL_TOOLS:
-            new_messages.append(ToolMessage(
-                content=(
-                    "Deferred: this search was requested before the analytics result "
-                    "was available. Read the analytics result, then call this tool again "
-                    "with a query that uses it."
-                ),
-                tool_call_id=tc_id,
-            ))
-            continue
-        dedupe_key = (name, json.dumps(args, sort_keys=True, default=str))
-        if dedupe_key in seen:
-            new_messages.append(
-                ToolMessage(
-                    content="This exact call was already made. Use the previous result and write final answer",
-                    tool_call_id=tc_id,
-                )
-            )
-            continue
-        seen.add(dedupe_key)
-
-        try:
-            get_stream_writer()({"stage": "execute", "label": f"Executing tool: {name}"})
-            print(f"[CALLING TOOL] -> {name} with args: {args} \n") #Debuggins print
-            result = t.invoke(args)
-
-        except ValidationError as exc:
-            result = {"error": f"Invalid arguments for {name}: {exc}. Fix the arguments and call again"}
-        except Exception as exc:
-            result = {"error": str(exc)}
-
-
-        log_adds.append({"tool_name": name, "arguments": args, "result": result})
-
-        new_messages.append(ToolMessage(content=_render_result(result=result), tool_call_id=tc_id))
-
-    return {
-        "messages": new_messages,
-        "tool_calls_log": log_adds,
-    }
-
-
-
-
-def force_final_node(state: AgentState) -> dict[str, Any]:
-    last = state["messages"][-1]
-    notes = [
-        ToolMessage(
-            content="Tool call budget reached. Write the final answer now from the information already gathered.",
-            tool_call_id=tc["id"],
-        )
-        for tc in last.tool_calls
-    ]
-    try:
-        resp = LLM_PLAIN.invoke(state["messages"] + notes)
-        answer = (resp.content or "").strip()
-    except Exception:
-        answer = ""
-    return {"messages": notes, "answer": answer}
 
 def finalize_node(state: AgentState) -> dict[str, Any]:
-    get_stream_writer()({"stage": "generate", "label": "answering"})
     answer = (state.get("answer") or "").strip()
     if not answer:
         answer = (
-            "I could not provide a grounded answer from the available tools and data"
+            "I could not provide a grounded answer from the available tools and data. "
             "Please try rephrasing your question"
         )
     return {"answer": answer}
@@ -228,7 +130,101 @@ def _route_after_agent(state: AgentState)-> str:
 
 
 
-def _build_graph()-> Any:
+def _build_graph(tools)-> Any:
+    tools_by_name = {t.name: t for t in tools}
+    llm_tools = _make_llm().bind_tools(tools)
+    llm_plain = _make_llm()
+
+    async def agent_node(state: AgentState) -> dict[str, Any]:
+        get_stream_writer()({"stage": "tools", "label": "choosing tools"})
+        resp = await llm_tools.ainvoke(state["messages"])
+        update: dict[str, Any] = {"messages": [resp], "steps": state["steps"]+1}
+        if not resp.tool_calls:
+            update["answer"] = (resp.content or "").strip()
+        return update
+    
+    async def tools_node(state: AgentState):
+
+        last = state["messages"][-1]
+        print(f"[TOOL CALLS LOG] -> {state['tool_calls_log']} \n") #Debuggins print
+        seen = { 
+            (e["tool_name"], json.dumps(e["arguments"], sort_keys=True, default=str))
+            for e in state["tool_calls_log"]
+        }
+        has_analytics = any(tc["name"] in ANALYTICS_TOOLS for tc in last.tool_calls)
+        new_messages: list[AnyMessage] = []
+        log_adds: list[dict[str, Any]] = []
+        #src_adds: list[str] = [] #TODO add source (if retrieving where the answer is from)
+        for tc in last.tool_calls:
+            name = tc["name"]
+            args = tc.get("args") or {}
+            tc_id = tc["id"]
+
+            t = tools_by_name.get(name)
+            if t is None:
+                new_messages.append(ToolMessage(
+                    content=f"Unknown tool '{name}'. Available tools: {','.join(tools_by_name)}",
+                    tool_call_id=tc_id,
+                ))
+                continue
+            
+            if has_analytics and name in RETRIEVAL_TOOLS:
+                new_messages.append(ToolMessage(
+                    content=(
+                        "Deferred: this search was requested before the analytics result "
+                        "was available. Read the analytics result, then call this tool again "
+                        "with a query that uses it."
+                    ),
+                    tool_call_id=tc_id,
+                ))
+                continue
+            dedupe_key = (name, json.dumps(args, sort_keys=True, default=str))
+            if dedupe_key in seen:
+                new_messages.append(
+                    ToolMessage(
+                        content="This exact call was already made. Use the previous result and write final answer",
+                        tool_call_id=tc_id,
+                    )
+                )
+                continue
+            seen.add(dedupe_key)
+
+            try:
+                get_stream_writer()({"stage": "execute", "label": f"Executing tool: {name}"})
+                print(f"[CALLING TOOL] -> {name} with args: {args} \n") #Debuggins print
+                result = await t.ainvoke(args)
+
+            except ValidationError as exc:
+                result = {"error": f"Invalid arguments for {name}: {exc}. Fix the arguments and call again"}
+            except Exception as exc:
+                result = {"error": str(exc)}
+
+
+            log_adds.append({"tool_name": name, "arguments": args, "result": result})
+
+            new_messages.append(ToolMessage(content=_render_result(result=result), tool_call_id=tc_id))
+
+        return {
+            "messages": new_messages,
+            "tool_calls_log": log_adds,
+        }
+
+    async def force_final_node(state: AgentState) -> dict[str, Any]:
+        last = state["messages"][-1]
+        notes = [
+            ToolMessage(
+                content="Tool call budget reached. Write the final answer now from the information already gathered.",
+                tool_call_id=tc["id"],
+            )
+            for tc in last.tool_calls
+        ]
+        try:
+            resp = await llm_plain.ainvoke(state["messages"] + notes)
+            answer = (resp.content or "").strip()
+        except Exception:
+            answer = ""
+        return {"messages": notes, "answer": answer}
+
     g = StateGraph(AgentState)
     g.add_node("agent", agent_node)
     g.add_node("tools", tools_node)
@@ -245,5 +241,3 @@ def _build_graph()-> Any:
     g.add_edge("finalize", END)
     return g.compile(checkpointer=InMemorySaver())
 
-
-GRAPH = _build_graph()

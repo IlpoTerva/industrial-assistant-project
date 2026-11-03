@@ -21,19 +21,21 @@ class Settings:
     OLLAMA_MODEL_FALLBACK = os.getenv("OLLAMA_MODEL_FALLBACK", "qwen2.5:7b-instruct")
     
     LLM_MODELS = [OLLAMA_MODEL, OLLAMA_MODEL_FALLBACK]
+
     # ---- Embeddings + Vector store (all local) ----
     EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "intfloat/multilingual-e5-base")
     VECTOR_STORE_DIR = _resolve_path(os.getenv("VECTOR_STORE_DIR", "data/chroma_store"))
-    # Chroma requires a 3–512 char collection name ([a-zA-Z0-9._-]).
+    # Chroma collections
     MANUALS_COLLECTION = os.getenv("MANUALS_COLLECTION","manuals") 
     TROUBLE_COLLECTION = os.getenv("TROUBLE_COLLECTION","troubleshoot") 
     COMMON_COLLECTION = os.getenv("COMMON_COLLECTION", "common")
-
+    
+    #NOTE not done manual figures
     MANUAL_IMAGES = _resolve_path(os.getenv("MANUAL_IMAGES", "data/raw/manual/figures"))
 
+    #RAG parameters and settings
     RAG_TOP_K = int(os.getenv("RAG_TOP_K", "5"))
     RAG_SCORE_FLOOR = float(os.getenv("RAG_SCORE_FLOOR", "0.75"))
-    CASES_JSON = os.getenv("TROUBLESHOOT_CASES_JSON", "data/raw/cases.json")
 
 
     TS_MARGIN = os.getenv("TS_MARGIN", "0.05")
@@ -41,9 +43,14 @@ class Settings:
     # ---- Agent loop ----
     MAX_TOOL_ITERS = int(os.getenv("MAX_TOOL_ITERS", "6"))
 
-    DATA_ENDPOINT = os.getenv("DATA_ENDPOINT", "http://localhost:3000") #MES endpoint
-    FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN", "http://localhost:5173")
+    #APIs and MCPs
+    DATA_ENDPOINT = os.getenv("DATA_ENDPOINT", "http://localhost:3000") #MES endpoint 
+    FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN", "http://localhost:5173") #Frontend
     
+    USE_MCP = True #NOTE Set to False if MCP is not utilized
+    MCP_URL = os.getenv("MCP_ENDPOINT", "http://localhost:8001/mcp")
+    #Additional files and dirs.
+    CASES_JSON = os.getenv("TROUBLESHOOT_CASES_JSON", "data/raw/cases.json")
     VOICE_DIR = {
         "en": _resolve_path(os.getenv("EN_DIR", "voices/en/john/medium")),
         "fi": _resolve_path(os.getenv("FI_DIR", "voices/fi/harri/medium"))

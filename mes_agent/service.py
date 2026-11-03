@@ -10,8 +10,11 @@ from langchain_core.messages import (AIMessage,
 from langgraph.types import Command
 from typing import Any
 
-from mes_agent.chat_lang import GRAPH, SYSTEM_PROMPT
+from mes_agent.chat_lang import SYSTEM_PROMPT, _build_graph
+from mes_agent.tools import load_tools
 from api.schemas import ChatResponse
+
+GRAPH = None
 
 def _build_message(message: str, history: list[dict[str, Any]]) -> list[AnyMessage]:
     messages: list[AnyMessage] = [SystemMessage(content=SYSTEM_PROMPT)]
@@ -44,21 +47,20 @@ def _answer_response(state: dict) -> ChatResponse:
         blocks=[{"type": "text", "text": state["answer"]}],#TODO add sources.
     )
 
-def stream_chat_response(message: str, session_id: str, choice_id: str | None = None):
+async def init():
+    global GRAPH
+    GRAPH = _build_graph(await load_tools())
+
+async def stream_chat_response(message: str, session_id: str, choice_id: str | None = None):
     cfg = {"configurable": {"thread_id": session_id}}
     graph_input = _initial_state(message=message, history=[])
 
-    for chunk in GRAPH.stream(graph_input, cfg, stream_mode="custom"):
+    async for chunk in GRAPH.astream(graph_input, cfg, stream_mode="custom"):
         if "stage" in chunk:
             yield {"type": "stage", **chunk}
 
-    snap = GRAPH.get_state(cfg)
+    snap = await GRAPH.aget_state(cfg)
     #NOTE fix this, no need for interrupts in the agent loop
-    interrupts = [i for task in snap.tasks for i in task.interrupts]
-
-    if interrupts:
-        resp = _answer_response(payload=interrupts[0].value, state=snap.values)
-    else:
-            resp = _answer_response(snap.values)
+    resp = _answer_response(snap.values)
 
     yield {"type": "result", "data": resp.model_dump()}
