@@ -8,14 +8,15 @@ from langchain_openai import ChatOpenAI
 from langgraph.graph import END, START, StateGraph
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.graph.message import add_messages
-from langgraph.config import get_stream_writer
+
 from pydantic import ValidationError
 
 import operator
 from mes_agent.tools import  ANALYTICS_TOOLS, RETRIEVAL_TOOLS
 from tools.core import get_date
 from api.config import settings
-
+from api.progress import emit
+import time
 
 
 SYSTEM_PROMPT_TEMPLATE = """
@@ -88,7 +89,13 @@ def _make_llm()-> Any:
 
     return llm
 
+TOOL_LABELS = {
+    "get_most_common_codes": "Ranking MES records",
+    "get_routings": "Looking up past routings",
+    "search_documents": "Searching fault logs"
+}
 
+TOOL_SOURCE ="MES MCP Server" if settings.USE_MCP else "local tools"
 
 _MAX_TOOL_RESULT_CHARS = 4000
 def _render_result(result: dict[str, Any]) -> str:
@@ -101,6 +108,15 @@ def _render_result(result: dict[str, Any]) -> str:
         text = text[:_MAX_TOOL_RESULT_CHARS] + " ...[truncated]"
     return text
 
+def _as_dict(result):
+    if isinstance(result, list):
+        result = "".join(b.get("text","") for b in result if isinstance(b, dict))
+    if isinstance(result, str):
+        try:
+            return json.loads(result)
+        except ValueError:
+            return {"text": result}
+    return result
 
 
 class AgentState(TypedDict):
@@ -136,8 +152,11 @@ def _build_graph(tools)-> Any:
     llm_plain = _make_llm()
 
     async def agent_node(state: AgentState) -> dict[str, Any]:
-        get_stream_writer()({"stage": "tools", "label": "choosing tools"})
+        step_id = f"think-{state['steps']}"
+        emit(step_id, label="Reading the question" if state["steps"]==0 else "Reading tool results")
         resp = await llm_tools.ainvoke(state["messages"])
+        emit(step_id, label="Reading the question" if state["steps"]==0 else "Reading tool results", detail="Done")
+
         update: dict[str, Any] = {"messages": [resp], "steps": state["steps"]+1}
         if not resp.tool_calls:
             update["answer"] = (resp.content or "").strip()
@@ -188,18 +207,24 @@ def _build_graph(tools)-> Any:
                 )
                 continue
             seen.add(dedupe_key)
-
+            step_id = f"tool-{tc_id}"
+            label = TOOL_LABELS.get(name, name)
+            emit(step_id=step_id, label=label, detail=f"Calling {TOOL_SOURCE}")
+            t0 = time.perf_counter()
             try:
-                get_stream_writer()({"stage": "execute", "label": f"Executing tool: {name}"})
                 print(f"[CALLING TOOL] -> {name} with args: {args} \n") #Debuggins print
-                result = await t.ainvoke(args)
+                result = await _as_dict(t.ainvoke(args))
 
             except ValidationError as exc:
                 result = {"error": f"Invalid arguments for {name}: {exc}. Fix the arguments and call again"}
             except Exception as exc:
                 result = {"error": str(exc)}
 
-
+            ms = round((time.perf_counter() - t0) * 1000)
+            if "error" in result:
+                emit(step_id=step_id, label=label, detail="Failed", ms=ms)
+            else:
+                emit(step_id=step_id, label=label, detail="Done", ms=ms)
             log_adds.append({"tool_name": name, "arguments": args, "result": result})
 
             new_messages.append(ToolMessage(content=_render_result(result=result), tool_call_id=tc_id))

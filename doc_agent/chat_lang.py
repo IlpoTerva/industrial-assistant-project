@@ -11,14 +11,15 @@ from langgraph.checkpoint.memory import InMemorySaver
 from langchain_openai import ChatOpenAI
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.message import add_messages
-from langgraph.types import Command, interrupt
-from langgraph.config import get_stream_writer
+from langgraph.types import interrupt
+
 
 
 from lingua import LanguageDetectorBuilder, Language
 
 from doc_agent.tools import tool_retrieve, tool_troubleshoot_lookup, TOOL_SCHEMAS
 from api.config import settings
+from api.progress import emit
 
 
 SYSTEM_PROMPT = """
@@ -131,7 +132,7 @@ def _detect_language(text: str, fallback: str):
     
 
 def detect_lang_node(state: AgentState):
-    get_stream_writer()({"stage": "language", "label": "Detecting language"})
+    emit(step_id="language", label="Detecting language")
     return {"lang": _detect_language(state["user_message"], fallback=state.get("lang", "en"))}
 
 _PROTECT_RE = re.compile(
@@ -174,14 +175,14 @@ def classify_node(state: AgentState):
     return {"route": route}
 
 def manuals_node(state: AgentState):
-    get_stream_writer()({"stage": "manual", "label": "Searching manual"})
+    emit(step_id="manual", label="Searching manuals")
     print(f"[MANUAL NODE] query: {state['user_message']}" )
     ret = tool_retrieve(state["user_message"])
     return {"context": ret["result"].get("chunks", [])}
     
 
 def troubleshoot_node(state: AgentState):
-    get_stream_writer()({"stage": "troubleshooting", "label": "Checking alarm causes"})
+    emit(step_id="troubleshooting", label="Checking alarm causes")
     query = state["query"] or state["user_message"]
     print(f"[TROUBLESHOOT] query: {query}")
     out = tool_troubleshoot_lookup(query, exclude=state["excluded"])["result"]
@@ -213,8 +214,7 @@ def clarify_node(state: AgentState):
 
 
 def answer_node(state: AgentState):
-    
-    get_stream_writer()({"stage": "generate", "label": "Writing answer"})
+    emit(step_id="generate", label="Writing answer")
     if not state["context"]:
         return {"answer": ""}
     resp = LLM_PLAIN.invoke([SystemMessage(SYSTEM_PROMPT),
