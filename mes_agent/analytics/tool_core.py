@@ -5,7 +5,7 @@ from mes_agent.analytics.mes_analytics import (
 from mes_agent.analytics.retrieve import retrieve
 import requests
 from api.config import settings
-from typing import Literal
+from typing import Literal, Any
 
 
 def get_date():
@@ -64,7 +64,7 @@ def get_most_common_codes(
     return most_common_codes_API(df, group_by=group_by, metric=metric, n=n)
 
 
-def get_routings(part_family: str, n: int = 3) -> dict[str, any]:
+def get_routings(part_family: str, n: int = 3) -> dict[str, Any]:
     """How parts of a family have been routed in historical MES data, most common routes first. 
     
     Args:
