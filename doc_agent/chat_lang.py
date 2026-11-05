@@ -42,13 +42,13 @@ Rules:
 """
 
 
-def _make_llm(with_tools:bool)-> Any:
+def _make_llm(with_tools:bool, temp:int=0)-> Any:
     """Create a LangChain LLM instance with or without tools."""
     llm = ChatOpenAI(
         base_url=settings.OLLAMA_BASE_URL,
         api_key="ollama",
         model_name=settings.OLLAMA_MODEL,
-        temperature=0,
+        temperature=temp,
     )
 
     if with_tools:
@@ -58,7 +58,7 @@ def _make_llm(with_tools:bool)-> Any:
 
 #LLM_TOOLS = _make_llm(with_tools=True)
 LLM_PLAIN = _make_llm(with_tools=False)
-LLM_TRANSLATE = _make_llm(with_tools=False)
+LLM_TRANSLATE = _make_llm(with_tools=False, temp=0.5)
 
 _MAX_TOOL_RESULT_CHARS = 4000
 
@@ -148,22 +148,26 @@ def _translate(text: str, target: str) -> str:
         HumanMessage(content=f"<text>\n{text}\n<text>")
     ]
     must_keep = set(_PROTECT_RE.findall(text))
+    out = ""
     for _ in range(2):
         out = (LLM_TRANSLATE.invoke(msgs).content or "").strip()
         out = re.sub(r"<text>\s*|\s*<\text>$", "", out)
+        print(out)
         if out and must_keep <= set(_PROTECT_RE.findall(out)):
             return out
     emit(step_id="translate", label="Translating text", detail="Done")
-    return text
+    return out
 
 def translate_in_node(state: AgentState):
-    return {"query": _translate(state["user_message"], "en")}
+    trans = _translate(state["user_message"], "en")
+    return {"query": trans, "user_message": trans}
 
 def translate_out_node(state: AgentState):
-    return {"answer": _translate(state["answer"], state["lang"])}
+    trans = _translate(state["answer"], state["lang"])
+    return {"answer": trans}
 
 ALARM_RE = re.compile(r"\b(?:\d{4,6}|[AF]\d{2,5}\b)")
-TROUBLE_WORDS = ("error", "alarm", "fault", "vika", "hälytys", "virhe")
+TROUBLE_WORDS = ("error", "alarm", "fault", "vika", "hälytys", "virhe", "ongelma")
 
 def _rule_based_route(text: str) -> str:
     if ALARM_RE.search(text) or any(w in text for w in TROUBLE_WORDS):
@@ -186,7 +190,7 @@ def manuals_node(state: AgentState):
 
 def troubleshoot_node(state: AgentState):
     emit(step_id="troubleshooting", label="Checking alarm causes", detail="Searching")
-    query = state["query"] or state["user_message"]
+    query = state["query"] if state["query"] != "" else state["user_message"]
     print(f"[TROUBLESHOOT] query: {query}")
     out = tool_troubleshoot_lookup(query, exclude=state["excluded"])["result"]
     emit(step_id="troubleshooting", label="Checking alarm causes", detail="Done")
@@ -223,7 +227,8 @@ def answer_node(state: AgentState):
         return {"answer": ""}
     resp = LLM_PLAIN.invoke([SystemMessage(SYSTEM_PROMPT),
                              *state["messages"][-8:],
-                             HumanMessage(content=f"Context: \n{_format_context(state['context'])}\n\n"
+                             HumanMessage(content=f"Initial question: {state['user_message']}"
+                                          f"Context: \n{_format_context(state['context'])}\n\n"
                                           f"Answer the operator's question using only this context")
                              ])
     answer = (resp.content or "").strip()
